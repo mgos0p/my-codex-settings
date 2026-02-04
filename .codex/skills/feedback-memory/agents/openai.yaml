@@ -1,0 +1,4 @@
+interface:
+  display_name: "指摘メモリ"
+  short_description: "レビュー・設計・運用の指摘を蓄積して素早く検索する"
+  default_prompt: "Use $feedback-memory to 指摘の保存と検索を行う。"

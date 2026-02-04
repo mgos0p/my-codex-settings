@@ -1,0 +1,6 @@
+.DS_Store
+logs/
+
+.codex/*
+!.codex/skills/
+!.codex/skills/**
