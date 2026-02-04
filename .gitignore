@@ -1,8 +1,11 @@
 .DS_Store
-__pycache__/
-*.pyc
 logs/
 
 .codex/*
 !.codex/skills/
 !.codex/skills/**
+
+# skills 内のキャッシュ類は常に除外
+.codex/skills/**/.DS_Store
+.codex/skills/**/__pycache__/
+.codex/skills/**/*.pyc
