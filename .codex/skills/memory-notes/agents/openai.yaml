@@ -1,0 +1,4 @@
+interface:
+  display_name: "Memory Notes"
+  short_description: "Save key points to Markdown and recall summaries"
+  default_prompt: "ユーザーが「記憶して/覚えておいて」で要点をMarkdownに保存し、「○○について思い出して」で検索して要約を返す。必要なら/Users/mgos0p/.codex/memoryをGitHubに公開・コミットする。"
