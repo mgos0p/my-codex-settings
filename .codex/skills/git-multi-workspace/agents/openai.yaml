@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Multi Workspace"
+  short_description: "Clone/worktree into dev/review/hotfix/spare"
+  default_prompt: "Set up or switch dev/review/hotfix/spare workspaces for a git repo URL."
