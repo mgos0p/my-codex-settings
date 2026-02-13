@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import os
 import shlex
+import shutil
 import subprocess
 import sys
 from typing import Dict, Iterable, Set
@@ -134,6 +135,22 @@ def resolve_start_point(repo_path: str, start_point: str | None) -> str:
     if ref_exists(repo_path, remote_ref):
         return f"origin/{default}"
     return default
+
+
+def git_root_from_repo_root(repo_root: str) -> str | None:
+    git_root = os.path.join(repo_root, ".git-worktree")
+    if not os.path.isdir(git_root):
+        return None
+    result = run(["git", "-C", git_root, "rev-parse", "--git-dir"], check=False)
+    if result.returncode == 0:
+        return git_root
+    return None
+
+
+def is_safe_child(parent: str, child: str) -> bool:
+    parent_abs = os.path.abspath(parent)
+    child_abs = os.path.abspath(child)
+    return os.path.commonpath([parent_abs, child_abs]) == parent_abs
 
 
 def checkout_branch(
@@ -309,6 +326,54 @@ def switch_command(args: argparse.Namespace) -> None:
     )
 
 
+def remove_workspace(repo_root: str, workspace: str, force: bool) -> None:
+    workspace_path = os.path.join(repo_root, workspace)
+    if not is_safe_child(repo_root, workspace_path):
+        print(f"[ERROR] Unsafe workspace path: {workspace_path}", file=sys.stderr)
+        sys.exit(1)
+    if not os.path.exists(workspace_path):
+        print(f"[SKIP] {workspace_path} not found")
+        return
+
+    git_root = git_root_from_repo_root(repo_root)
+    if git_root:
+        cmd = ["git", "-C", git_root, "worktree", "remove"]
+        if force:
+            cmd.append("--force")
+        cmd.append(workspace_path)
+        result = run(cmd, check=False)
+        if result.returncode != 0:
+            print(f"[ERROR] Failed to remove worktree {workspace_path}", file=sys.stderr)
+            sys.exit(result.returncode)
+        return
+
+    if force:
+        shutil.rmtree(workspace_path, ignore_errors=True)
+    else:
+        shutil.rmtree(workspace_path)
+
+
+def remove_command(args: argparse.Namespace) -> None:
+    if args.all and args.workspace:
+        print("[ERROR] Use either <workspace> or --all", file=sys.stderr)
+        sys.exit(1)
+    if not args.all and not args.workspace:
+        print("[ERROR] Workspace is required unless --all is specified", file=sys.stderr)
+        sys.exit(1)
+
+    base = normalize_base(args.base)
+    repo_name = repo_name_from_url(args.repo)
+    repo_root = os.path.join(base, repo_name)
+
+    if not os.path.isdir(repo_root):
+        print(f"[ERROR] Repo root not found: {repo_root}", file=sys.stderr)
+        sys.exit(1)
+
+    targets = WORKSPACES if args.all else (args.workspace,)
+    for workspace in targets:
+        remove_workspace(repo_root, workspace, args.force)
+
+
 def paths_command(args: argparse.Namespace) -> None:
     base = normalize_base(args.base)
     repo_name = repo_name_from_url(args.repo)
@@ -348,6 +413,13 @@ def build_parser() -> argparse.ArgumentParser:
     paths.add_argument("repo", help="Git URL or local path")
     paths.add_argument("--base", default=DEFAULT_BASE, help="Base directory")
 
+    remove = subparsers.add_parser("remove", help="Remove worktree/clone workspace")
+    remove.add_argument("repo", help="Git URL or local path")
+    remove.add_argument("workspace", nargs="?", choices=WORKSPACES)
+    remove.add_argument("--all", action="store_true", help="Remove all workspaces")
+    remove.add_argument("--force", action="store_true", help="Force remove even if dirty")
+    remove.add_argument("--base", default=DEFAULT_BASE, help="Base directory")
+
     return parser
 
 
@@ -363,6 +435,9 @@ def main() -> None:
         return
     if args.command == "paths":
         paths_command(args)
+        return
+    if args.command == "remove":
+        remove_command(args)
         return
 
     parser.print_help()
