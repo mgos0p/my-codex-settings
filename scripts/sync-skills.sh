@@ -29,13 +29,12 @@ case "$OS" in
     SRC_WIN="$(cygpath -w "$SRC")"
     DEST_WIN="$(cygpath -w "$DEST")"
 
-    powershell.exe -NoProfile -Command '
-      $src = $args[0]
-      $dest = $args[1]
+    powershell.exe -NoProfile -Command '& {
+      param([string]$src, [string]$dest)
       New-Item -ItemType Directory -Force -Path $dest | Out-Null
       robocopy $src $dest /MIR /XD .git /XF .DS_Store | Out-Null
       if ($LASTEXITCODE -ge 8) { exit $LASTEXITCODE }
-    ' --% "$SRC_WIN" "$DEST_WIN"
+    }' "$SRC_WIN" "$DEST_WIN"
     ;;
   *)
     echo "Unsupported OS: $OS" >&2
