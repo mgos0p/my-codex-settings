@@ -1,0 +1,4 @@
+interface:
+  display_name: "CBT Action Skill"
+  short_description: "CBTでメモを整理し小さな回復行動TODOを提案する"
+  default_prompt: "Use $cbt-action-todo to organize this note and suggest a few small recovery actions."

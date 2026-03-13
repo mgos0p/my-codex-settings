@@ -1,0 +1,4 @@
+interface:
+  display_name: "Career Story"
+  short_description: "整理されていない経歴メモを面接向けストーリーに変換する"
+  default_prompt: "Use $career-story to 整理されていない経験メモを、日本語の面接用プロジェクト説明にまとめてください。本人の貢献を明確にし、不足情報があれば必要最小限だけ質問してください。"

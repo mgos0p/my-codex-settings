@@ -1,0 +1,4 @@
+interface:
+  display_name: "Overthinking Stop"
+  short_description: "Stop rumination with one grounded next step"
+  default_prompt: "Use $overthinking-stop to help me stop overthinking this situation."

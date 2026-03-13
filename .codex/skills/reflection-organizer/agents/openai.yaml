@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reflection Organizer"
+  short_description: "Organize diary notes with mood and energy scores"
+  default_prompt: "Use $reflection-organizer to reorganize this diary entry into DATE, MOOD_SCORE, ENERGY_SCORE, EVENT, FEELINGS, THOUGHTS, ACTION, and NEXT_SMALL_STEP."
