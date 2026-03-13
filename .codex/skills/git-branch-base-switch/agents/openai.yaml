@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Branch Base Switch"
+  short_description: "A→B→C分岐とベース切替を確認付きで自動化するスキル"
+  default_prompt: "AをベースにBを作り、BをベースにCを作成し、BをAへマージ後にCのベースをBからAへ切り替えて。まずplanを出してからrunして。"
